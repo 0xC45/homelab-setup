@@ -6,6 +6,7 @@ This project is the "configuration as code" for my homelab environment. The proj
 ## Table of Contents
 1. [Router](#router)
 1. [Gitea](#gitea)
+1. [Nextcloud](#nextcloud)
 
 
 ## Router
@@ -64,3 +65,32 @@ This project is the "configuration as code" for my homelab environment. The proj
       --admin
     ```
 1. Log in, setup SSH keys, GPG keys, repos, etc.
+
+
+## Nextcloud
+
+1. Provision a VM
+    - 1 CPU
+    - 1 GB memory
+    - 64 GB disk
+1. Install Debian 10
+    - Disable GUI
+    - Enable SSH
+1. Setup passwordless SSH
+    ```
+    mkdir ~/.ssh
+    chmod 700 ~/.ssh
+    nano ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+    ```
+1. Install sudo
+    ```
+    apt install sudo
+    usermod -aG sudo <user>
+    ```
+1. Run nextcloud Ansible role
+    ```
+    make nextcloud
+    ```
+1. Complete installation with web UI
+1. Install "Deck" App

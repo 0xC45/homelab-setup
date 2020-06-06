@@ -1,0 +1,174 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+  name: check platform
+  fail:
+    msg: This role requires Debian 10
+
+########## SETUP
+
+- name: install dependencies
+  become: true
+  apt:
+    name: '{{ nextcloud_package_name }}'
+  loop:
+    - apache2               # required, web server
+    - libapache2-mod-php7.3 # required, apache php module
+    - postgresql-11         # required, database
+    - python-psycopg2       # required, for ansible postgres modules
+    - php7.3                # required, server-side scripting language
+    - php7.3-pgsql          # required, database connector module
+    - php7.3-curl           # required
+    - php7.3-gd             # required
+    - php7.3-mbstring       # required
+    - php7.3-xml            # required
+    - php7.3-zip            # required
+    - php7.3-bz2            # recommended, for extraction of apps
+    - php7.3-intl           # recommended, for language translation and handling of non-ASCII characters
+    - php7.3-gmp            # optional, for sftp storage
+    - php-imagick           # optional, for image preview generation
+    - rsync                 # optional, for backup/restore
+  loop_control:
+    loop_var: nextcloud_package_name
+
+- name: create /root/ansible-workdir/nextcloud/ directory
+  become: true
+  file:
+    path: /root/ansible-workdir/nextcloud/
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+
+########## NEXTCLOUD
+
+- name: check if nextcloud archive exists
+  register: nextcloud_archive
+  become: true
+  stat:
+    path: /root/ansible-workdir/nextcloud/nextcloud-18.0.5.tar.bz2
+
+- name: download nextcloud archive
+  when: nextcloud_archive.stat.exists == false
+  become: true
+  get_url:
+    url: https://download.nextcloud.com/server/releases/nextcloud-18.0.5.tar.bz2
+    checksum: sha256:52182fcdc289061f981100f53ccd411c35a10b81d1b88a934af9668c8055d753
+    dest: /root/ansible-workdir/nextcloud/nextcloud-18.0.5.tar.bz2
+    mode: 0600
+    owner: root
+    group: root
+
+- name: extract nextcloud archive
+  become: true
+  unarchive:
+    src: /root/ansible-workdir/nextcloud/nextcloud-18.0.5.tar.bz2
+    remote_src: true
+    dest: /var/www/
+    creates: /var/www/nextcloud
+    owner: www-data
+    group: www-data
+
+########## TLS CERTIFICATES
+
+- name: create /etc/apache2/ssl/ directory
+  become: true
+  file:
+    path: /etc/apache2/ssl/
+    state: directory
+    mode: 0744
+    owner: root
+    group: root
+
+- name: copy server private key to apache config directory
+  become: true
+  copy:
+    content: '{{ nextcloud_key }}'
+    dest: /etc/apache2/ssl/nextcloud.key.pem
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache
+
+- name: copy server cert to apache config directory
+  become: true
+  copy:
+    content: '{{ nextcloud_cert }}'
+    dest: /etc/apache2/ssl/nextcloud.cert.pem
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart apache
+
+########## APACHE
+
+- name: enable apache modules
+  become: true
+  apache2_module:
+    name: '{{ apache2_module_name }}'
+  loop:
+    - dir
+    - env
+    - headers
+    - mime
+    - rewrite
+    - ssl
+  loop_control:
+    loop_var: apache2_module_name
+  notify: restart apache
+
+- name: create apache site config file
+  become: true
+  copy:
+    src: roles/nextcloud/files/nextcloud.conf
+    dest: /etc/apache2/sites-available/nextcloud.conf
+    owner: root
+    group: root
+    mode: 0644
+    force: false
+  notify: restart apache
+
+- name: write cloud_hostname to site config file
+  become: true
+  replace:
+    path: /etc/apache2/sites-available/nextcloud.conf
+    regexp: '\${HOSTNAME}'
+    replace: '{{ nextcloud_hostname }}'
+  notify: restart apache
+
+- name: enable nextcloud site
+  register: enable_nextcloud_result
+  become: true
+  shell: a2ensite nextcloud.conf
+  changed_when: "'already enabled' not in enable_nextcloud_result.stdout"
+  notify: restart apache
+
+- name: disable default site
+  register: disable_default_result
+  become: true
+  shell: a2dissite 000-default.conf
+  changed_when: "'already disabled' not in disable_default_result.stdout"
+  notify: restart apache
+
+########## POSTGRES
+
+- name: start and enable postgresql service
+  become: true
+  systemd:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: create nextcloud postgres database
+  become_user: postgres
+  become: true
+  postgresql_db:
+    name: nextcloud
+
+- name: create nextcloud postgres user
+  become_user: postgres
+  become: true
+  postgresql_user:
+    db: nextcloud
+    name: nextcloud
+    password: '{{ nextcloud_postgres_password }}'
+

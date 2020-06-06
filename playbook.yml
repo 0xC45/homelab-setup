@@ -15,3 +15,8 @@
   roles:
     - auto_upgrades
     - gitea
+
+- hosts: nextcloud
+  roles:
+    - auto_upgrades
+    - nextcloud

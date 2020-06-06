@@ -7,6 +7,10 @@ all:
     gitea:
       ansible_host: gitea.mydomain.com
       ansible_python_interpreter: /usr/bin/python2
+    nextcloud:
+      ansible_host: nextcloud.mydomain.com
+      ansible_python_interpreter: /usr/bin/python2
   children:
     vms:
       gitea:
+      nextcloud:

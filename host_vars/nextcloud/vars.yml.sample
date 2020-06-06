@@ -1,0 +1,8 @@
+---
+ansible_become_pass: nextcloud_sudo_password
+nextcloud_hostname: nextcloud.mydomain.com
+nextcloud_postgres_password: postgres_password
+nextcloud_cert: |
+  tls_certificate
+nextcloud_key: |
+  private_key
