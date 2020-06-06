@@ -1,0 +1,20 @@
+---
+- name: debian - configure package repositories
+  become: true
+  copy:
+    src: roles/all/files/debian-sources.list
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: 0644
+
+- name: debian - upgrade installed packages
+  become: true
+  apt:
+    update_cache: true
+    upgrade: safe
+
+- name: debian - install vim
+  become: true
+  apt:
+    name: vim

@@ -1,0 +1,10 @@
+---
+ansible_become_pass: gitea_sudo_password
+gitea_hostname: gitea.mydomain.com
+gitea_user_name: username
+gitea_user_email: username@mydomain.com
+gitea_postgres_password: postgres_password
+gitea_cert: |
+  tls_certificate
+gitea_key: |
+  private_key

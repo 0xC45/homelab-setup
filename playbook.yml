@@ -3,6 +3,15 @@
   roles:
     - all
 
+- hosts: vms
+  roles:
+    - vms
+
 - hosts: router
   roles:
     - router
+
+- hosts: gitea
+  roles:
+    - auto_upgrades
+    - gitea

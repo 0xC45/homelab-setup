@@ -1,0 +1,46 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+  name: check platform
+  fail:
+    msg: This role requires Debian 10
+
+- name: install dependencies
+  become: true
+  apt:
+    name: '{{ auto_updates_package_name }}'
+  loop:
+    - apt-listchanges
+    - mailutils
+    - unattended-upgrades
+  loop_control:
+    loop_var: auto_updates_package_name
+
+- name: enable automatic upgrades
+  become: true
+  copy:
+    src: roles/auto_upgrades/files/20auto-upgrades
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure mail recipient
+  become: true
+  lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    insertafter: '//Unattended-Upgrade::Mail "";'
+    line: 'Unattended-Upgrade::Mail "root";'
+
+- name: enable auto reboot
+  become: true
+  lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    insertafter: '//Unattended-Upgrade::Automatic-Reboot "false";'
+    line: 'Unattended-Upgrade::Automatic-Reboot "true";'
+
+- name: configure auto reboot time
+  become: true
+  lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    insertafter: '//Unattended-Upgrade::Automatic-Reboot-Time "02:00";'
+    line: 'Unattended-Upgrade::Automatic-Reboot-Time "02:00";'

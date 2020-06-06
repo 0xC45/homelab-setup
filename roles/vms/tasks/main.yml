@@ -1,0 +1,17 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+  name: check platform
+  fail:
+    msg: This role requires Debian 10
+
+- name: install open-vm-tools
+  become: true
+  apt:
+    name: open-vm-tools
+
+- name: enable and start open-vm-tools service
+  become: true
+  systemd:
+    enabled: true
+    state: started
+    name: open-vm-tools

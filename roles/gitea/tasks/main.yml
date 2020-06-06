@@ -1,0 +1,255 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+  name: check platform
+  fail:
+    msg: This role requires Debian 10
+
+########## SETUP
+
+- name: install dependencies
+  become: true
+  apt:
+    name: '{{ gitea_package_name }}'
+  loop:
+    - git                  # for gitea to manage git repos
+    - xz-utils             # to extract gitea binary (using unxz)
+    - postgresql-11        # to store gitea application data
+    - python-psycopg2      # for ansible postgres modules
+  loop_control:
+    loop_var: gitea_package_name
+
+- name: create /root/ansible-workdir/gitea/ directory
+  become: true
+  file:
+    path: /root/ansible-workdir/gitea/
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+
+########## GITEA BINARY
+
+- name: check if gitea archive exists
+  register: gitea_archive
+  become: true
+  stat:
+    path: /root/ansible-workdir/gitea/gitea-1.11.6.xz
+
+- name: download gitea archive
+  when: gitea_archive.stat.exists == false
+  become: true
+  get_url:
+    url: https://dl.gitea.io/gitea/1.11.6/gitea-1.11.6-linux-amd64.xz
+    checksum: sha256:84bd98ff620649086c0514e1d4c5de2e3829280576cfecee61fad89c587784df
+    dest: /root/ansible-workdir/gitea/gitea-1.11.6.xz
+    mode: 0600
+    owner: root
+    group: root
+
+- name: check if gitea binary exists
+  register: gitea_binary
+  become: true
+  stat:
+    path: /root/ansible-workdir/gitea/gitea-1.11.6
+
+- name: extract gitea binary from archive
+  when: gitea_binary.stat.exists == false
+  become: true
+  shell: unxz -k /root/ansible-workdir/gitea/gitea-1.11.6.xz
+
+- name: install gitea binary to global location
+  become: true
+  copy:
+    src: /root/ansible-workdir/gitea/gitea-1.11.6
+    remote_src: true
+    dest: /usr/local/bin/gitea
+    mode: 0755
+    owner: root
+    group: root
+  notify: restart gitea
+
+########## LINUX USER
+
+- name: create git group
+  become: true
+  group:
+    name: git
+    state: present
+
+- name: create git user
+  become: true
+  user:
+    name: git
+    system: true
+    shell: /bin/bash
+    comment: gitea user
+    group: git
+    home: /home/git
+    state: present
+
+########## DIRECTORIES
+
+- name: create gitea data directories
+  become: true
+  file:
+    path: '{{ item.path }}'
+    state: directory
+    mode: 0750
+    owner: git
+    group: git
+  loop:
+    - { path: /var/lib/gitea }
+    - { path: /var/lib/gitea/custom }
+    - { path: /var/lib/gitea/data }
+    - { path: /var/lib/gitea/log }
+
+- name: create gitea config directory
+  become: true
+  file:
+    path: /etc/gitea
+    state: directory
+    mode: 0750
+    owner: root
+    group: git
+
+########## POSTGRES
+
+- name: start and enable postgresql service
+  become: true
+  systemd:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: create gitea postgres database
+  become_user: postgres
+  become: true
+  postgresql_db:
+    name: gitea
+
+- name: create gitea postgres user
+  become_user: postgres
+  become: true
+  postgresql_user:
+    db: gitea
+    name: gitea
+    password: '{{ gitea_postgres_password }}'
+
+########## GITEA CONFIG
+
+- name: create gitea config file
+  become: true
+  copy:
+    src: roles/gitea/files/app.ini
+    dest: /etc/gitea/app.ini
+    owner: root
+    group: git
+    mode: 0640
+    force: false
+
+- name: generate gitea JWT_SECRET
+  register: gitea_jwt_secret_result
+  changed_when: false
+  shell: gitea generate secret JWT_SECRET
+
+- name: write JWT_SECRET to gitea config file
+  become: true
+  replace:
+    path: /etc/gitea/app.ini
+    regexp: '\${JWT_SECRET}'
+    replace: '{{ gitea_jwt_secret_result.stdout }}'
+  notify: restart gitea
+
+- name: generate gitea INTERNAL_TOKEN
+  register: gitea_internal_token_result
+  changed_when: false
+  shell: gitea generate secret INTERNAL_TOKEN
+
+- name: write INTERNAL_TOKEN to gitea config file
+  become: true
+  replace:
+    path: /etc/gitea/app.ini
+    regexp: '\${INTERNAL_TOKEN}'
+    replace: '{{ gitea_internal_token_result.stdout }}'
+  notify: restart gitea
+
+- name: generate gitea SECRET_KEY
+  register: gitea_secret_key_result
+  changed_when: false
+  shell: gitea generate secret SECRET_KEY
+
+- name: write SECRET_KEY to gitea config file
+  become: true
+  replace:
+    path: /etc/gitea/app.ini
+    regexp: '\${SECRET_KEY}'
+    replace: '{{ gitea_secret_key_result.stdout }}'
+  notify: restart gitea
+
+- name: generate gitea LFS_JWT_SECRET
+  register: gitea_lfs_jwt_secret_result
+  changed_when: false
+  shell: gitea generate secret LFS_JWT_SECRET
+
+- name: write LFS_JWT_SECRET to gitea config file
+  become: true
+  replace:
+    path: /etc/gitea/app.ini
+    regexp: '\${LFS_JWT_SECRET}'
+    replace: '{{ gitea_lfs_jwt_secret_result.stdout }}'
+  notify: restart gitea
+
+- name: write POSTGRES_UESR_PASSWORD to gitea config file
+  become: true
+  replace:
+    path: /etc/gitea/app.ini
+    regexp: '^(PASSWD\s+=).*$'
+    replace: \1 {{ gitea_postgres_password }}
+
+- name: write gitea_hostname to gitea config file
+  become: true
+  replace:
+    path: /etc/gitea/app.ini
+    regexp: '\${HOSTNAME}'
+    replace: '{{ gitea_hostname }}'
+  notify: restart gitea
+
+########## TLS CERTIFICATES
+
+- name: copy server private key to gitea config directory
+  become: true
+  copy:
+    content: '{{ gitea_key }}'
+    dest: /var/lib/gitea/custom/key.pem
+    owner: git
+    group: git
+    mode: '0600'
+  notify: restart gitea
+
+- name: copy server cert to gitea config directory
+  become: true
+  copy:
+    content: '{{ gitea_cert }}'
+    dest: /var/lib/gitea/custom/cert.pem
+    owner: git
+    group: git
+    mode: '0600'
+  notify: restart gitea
+
+########## SYSTEMD SERVICE
+
+- name: create gitea systemd service config
+  become: true
+  copy:
+    src: roles/gitea/files/gitea.service
+    dest: /etc/systemd/system/gitea.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: start and enable gitea service
+  become: true
+  systemd:
+    enabled: true
+    state: started
+    name: gitea
