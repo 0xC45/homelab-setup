@@ -1,0 +1,16 @@
+---
+- name: reload pf config
+  become: true
+  shell: pfctl -f /etc/pf.conf
+
+- name: restart dhcpd
+  become: true
+  service:
+    name: dhcpd
+    state: restarted
+
+- name: restart unbound
+  become: true
+  service:
+    name: unbound
+    state: restarted

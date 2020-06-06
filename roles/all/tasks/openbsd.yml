@@ -1,0 +1,17 @@
+---
+- name: openbsd - apply system patches
+  become: true
+  syspatch:
+    apply: true
+
+- name: openbsd - upgrade installed packages
+  become: true
+  openbsd_pkg:
+    name: '*'
+    state: latest
+
+- name: openbsd - install vim
+  become: true
+  openbsd_pkg:
+    name: vim-8.2.534-no_x11
+    state: latest

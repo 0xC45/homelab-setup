@@ -1,0 +1,3 @@
+---
+- when: ansible_facts['distribution'] == "OpenBSD"
+  import_tasks: openbsd.yml

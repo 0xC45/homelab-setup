@@ -1,0 +1,57 @@
+---
+- when: ansible_distribution != 'OpenBSD' or ansible_distribution_version != '6.7'
+  name: check platform
+  fail:
+    msg: This role requires OpenBSD 6.7
+
+- name: setup pf config file
+  become: true
+  copy:
+    src: roles/router/files/pf.conf
+    dest: /etc/pf.conf
+    owner: root
+    group: wheel
+    mode: 0600
+  notify: reload pf config
+
+- name: setup dhcpd config file
+  become: true
+  copy:
+    src: roles/router/files/dhcpd.conf
+    dest: /etc/dhcpd.conf
+    owner: root
+    group: wheel
+    mode: 0644
+  notify: restart dhcpd
+
+- name: start and enable dhcpd
+  become: true
+  service:
+    name: dhcpd
+    state: started
+    enabled: yes
+    args: em1 em2
+
+- name: setup unbound config file
+  become: true
+  copy:
+    src: roles/router/files/unbound.conf
+    dest: /var/unbound/etc/unbound.conf
+    owner: root
+    group: wheel
+    mode: 0644
+  notify: restart unbound
+
+- name: start and enable unbound
+  become: true
+  service:
+    name: unbound
+    state: started
+    enabled: yes
+
+- name: enable ip forwarding
+  become: true
+  sysctl:
+    name: net.inet.ip.forwarding
+    value: '1'
+    state: present

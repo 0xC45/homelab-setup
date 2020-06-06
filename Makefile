@@ -1,0 +1,2 @@
+%:
+	./scripts/run-playbook.bash $@
