@@ -1,0 +1,6 @@
+---
+- name: restart harbor
+  become: true
+  systemd:
+    state: restarted
+    name: harbor

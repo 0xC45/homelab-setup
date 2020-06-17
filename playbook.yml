@@ -20,3 +20,9 @@
   roles:
     - auto_upgrades
     - nextcloud
+
+- hosts: harbor
+  roles:
+    - auto_upgrades
+    - docker
+    - harbor

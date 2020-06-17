@@ -7,6 +7,7 @@ This project is the "configuration as code" for my homelab environment. The proj
 1. [Router](#router)
 1. [Gitea](#gitea)
 1. [Nextcloud](#nextcloud)
+1. [Harbor](#harbor)
 
 
 ## Router
@@ -38,6 +39,7 @@ This project is the "configuration as code" for my homelab environment. The proj
     - 8 GB disk
 1. Install Debian 10
     - Disable GUI
+    - Disable print server
     - Enable SSH
 1. Setup passwordless SSH
     ```
@@ -75,6 +77,7 @@ This project is the "configuration as code" for my homelab environment. The proj
     - 64 GB disk
 1. Install Debian 10
     - Disable GUI
+    - Disable print server
     - Enable SSH
 1. Setup passwordless SSH
     ```
@@ -94,3 +97,37 @@ This project is the "configuration as code" for my homelab environment. The proj
     ```
 1. Complete installation with web UI
 1. Install "Deck" App
+
+
+## Harbor
+
+1. Provision a VM
+    - 2 CPU
+    - 4 GB memory
+    - 128 GB disk
+1. Install Debian 10
+    - Disable GUI
+    - Disable print server
+    - Enable SSH
+1. Setup passwordless SSH
+    ```
+    mkdir ~/.ssh
+    chmod 700 ~/.ssh
+    nano ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+    ```
+1. Install sudo
+    ```
+    apt install sudo
+    usermod -aG sudo <user>
+    ```
+1. Run harbor Ansible role
+    ```
+    make harbor
+    ```
+1. Log in to web UI and change admin password
+1. Configure Docker client to trust private CA
+    ```
+    sudo mkdir -p /etc/docker/certs.d/harbor.mydomain.com/
+    sudo vim /etc/docker/certs.d/harbor.mydomain.com/ca.crt
+    ```

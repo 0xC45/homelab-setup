@@ -1,0 +1,24 @@
+[Unit]
+Description=harbor
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+RestartSec=30s
+
+# Remove old containers, images and volumes
+ExecStartPre=/usr/local/bin/docker-compose -f /home/harbor/harbor/docker-compose.yml down -v
+ExecStartPre=/usr/local/bin/docker-compose -f /home/harbor/harbor/docker-compose.yml rm -v
+ExecStartPre=-/bin/bash -c 'docker volume rm $(docker volume ls -q)'
+ExecStartPre=-/bin/bash -c 'docker rmi $(docker images | grep "<none>" | awk \'{print $3}\')'
+ExecStartPre=-/bin/bash -c 'docker rm -v $(docker ps -aq)'
+
+# Compose up
+ExecStart=/usr/local/bin/docker-compose -f /home/harbor/harbor/docker-compose.yml up
+
+# Compose down, remove containers and volumes
+ExecStop=/usr/local/bin/docker-compose -f /home/harbor/harbor/docker-compose.yml down -v
+
+[Install]
+WantedBy=multi-user.target

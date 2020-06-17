@@ -1,0 +1,8 @@
+---
+ansible_become_pass: harbor_root_password
+harbor_hostname: harbor.mydomain.com
+harbor_database_password: database_password
+harbor_cert: |
+  tls_certificate
+harbor_key: |
+  private_key

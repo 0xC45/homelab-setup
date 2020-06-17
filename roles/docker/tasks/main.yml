@@ -1,0 +1,47 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+  name: check platform
+  fail:
+    msg: This role requires Debian 10
+
+- name: install docker dependencies
+  become: true
+  apt:
+    name: '{{ docker_dependency_package_name }}'
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+  loop_control:
+    loop_var: docker_dependency_package_name
+
+- name: add docker gpg key
+  become: true
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+
+- name: add docker package repository
+  become: true
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian buster stable
+
+- name: install docker packages
+  become: true
+  apt:
+    update_cache: true
+    name: '{{ docker_package_name }}'
+  loop:
+    - containerd.io
+    - docker-ce
+    - docker-ce-cli
+  loop_control:
+    loop_var: docker_package_name
+
+- name: allow user to access docker socket
+  become: true
+  user:
+    name: '{{ ansible_user_id }}'
+    groups: docker
+    append: true
