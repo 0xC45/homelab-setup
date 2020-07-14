@@ -5,6 +5,7 @@ case "${1}" in
 "gitea") ;;
 "nextcloud") ;;
 "harbor") ;;
+"k8s") ;;
 *)
   echo "error: specify service to configure (for example: ./scripts/run-playbook router)"
   exit 1

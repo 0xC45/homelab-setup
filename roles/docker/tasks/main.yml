@@ -45,3 +45,20 @@
     name: '{{ ansible_user_id }}'
     groups: docker
     append: true
+
+- name: setup docker daemon config
+  become: true
+  copy:
+    src: roles/docker/files/daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart docker
+
+- name: start and enable docker service
+  become: true
+  systemd:
+    enabled: true
+    state: started
+    name: docker

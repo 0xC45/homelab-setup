@@ -1,0 +1,62 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+  name: check platform
+  fail:
+    msg: This role requires Debian 10
+
+- name: check if kubelet is running
+  register: kubelet_on_master
+  changed_when: false
+  shell: ps aux | grep kubelet | grep -v grep | wc -l
+
+- name: initialize control plane
+  when: kubelet_on_master.stdout == "0"
+  become: true
+  shell: kubeadm init --pod-network-cidr=192.168.42.0/16
+
+- name: setup calico pod network add-on
+  when: kubelet_on_master.stdout == "0"
+  become: true
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl create -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
+
+- name: install jq
+  become: true
+  apt:
+    update_cache: true
+    name: jq
+
+- name: save cluster bootstrap token
+  when: kubelet_on_master.stdout == "0"
+  register: k8s_bootstrap_token
+  become: true
+  shell: |
+    kubeadm token list -o json | \
+      jq -r '.token' | \
+      head -n 1
+
+- name: save cluster discovery token
+  when: kubelet_on_master.stdout == "0"
+  register: k8s_discovery_token
+  become: true
+  shell: |
+    openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | \
+      openssl rsa -pubin -outform der 2>/dev/null | \
+      openssl dgst -sha256 -hex | sed 's/^.* //'
+
+- name: create ~/.kube directory
+  file:
+    path: /home/{{ ansible_user_id }}/.kube
+    state: directory
+    owner: '{{ ansible_user_id }}'
+    group: '{{ ansible_user_id }}'
+    mode: 0770
+
+- name: copy kube config to ~/.kube/config
+  become: true
+  copy:
+    src: /etc/kubernetes/admin.conf
+    remote_src: true
+    dest: /home/{{ ansible_user_id }}/.kube/config
+    owner: '{{ ansible_user_id }}'
+    group: '{{ ansible_user_id }}'
+    mode: 0660

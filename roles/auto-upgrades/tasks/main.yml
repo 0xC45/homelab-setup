@@ -18,7 +18,7 @@
 - name: enable automatic upgrades
   become: true
   copy:
-    src: roles/auto_upgrades/files/20auto-upgrades
+    src: roles/auto-upgrades/files/20auto-upgrades
     dest: /etc/apt/apt.conf.d/20auto-upgrades
     owner: root
     group: root

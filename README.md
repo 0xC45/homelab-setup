@@ -8,6 +8,7 @@ This project is the "configuration as code" for my homelab environment. The proj
 1. [Gitea](#gitea)
 1. [Nextcloud](#nextcloud)
 1. [Harbor](#harbor)
+1. [Kubernetes](#kubernetes)
 
 
 ## Router
@@ -130,4 +131,38 @@ This project is the "configuration as code" for my homelab environment. The proj
     ```
     sudo mkdir -p /etc/docker/certs.d/harbor.mydomain.com/
     sudo vim /etc/docker/certs.d/harbor.mydomain.com/ca.crt
+    ```
+
+
+## Kubernetes
+
+1. Provision 6 VMs
+    - 2 CPU
+    - 7 GB memory
+    - 32 GB disk
+1. Install Debian 10
+    - Disable GUI
+    - Disable print server
+    - Enable SSH
+1. Setup passwordless SSH
+    ```
+    mkdir ~/.ssh
+    chmod 700 ~/.ssh
+    nano ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+    ```
+1. Install sudo
+    ```
+    apt install sudo
+    usermod -aG sudo <user>
+    ```
+1. Run k8s Ansible role
+    ```
+    make k8s
+    ```
+1. (optional) Copy ~/.kube/config to local machine
+    ```
+    mkdir ~/.kube
+    chmod 770 ~/.kube
+    scp user@k8s-master.mydomain.com:~/.kube/config ~/.kube/config
     ```

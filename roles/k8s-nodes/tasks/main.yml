@@ -1,0 +1,18 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+  name: check platform
+  fail:
+    msg: This role requires Debian 10
+
+- name: check if kubelet is running
+  register: kubelet_on_node
+  changed_when: false
+  shell: ps aux | grep kubelet | grep -v grep | wc -l
+
+- name: join cluster
+  when: kubelet_on_node.stdout == "0"
+  become: true
+  shell: |
+    kubeadm join --token {{ hostvars['k8s-master']['k8s_bootstrap_token']['stdout'] }} \
+      {{ hostvars['k8s-master']['ansible_default_ipv4']['address'] }}:6443 \
+      --discovery-token-ca-cert-hash sha256:{{ hostvars['k8s-master']['k8s_discovery_token']['stdout'] }}

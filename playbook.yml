@@ -13,16 +13,30 @@
 
 - hosts: gitea
   roles:
-    - auto_upgrades
+    - auto-upgrades
     - gitea
 
 - hosts: nextcloud
   roles:
-    - auto_upgrades
+    - auto-upgrades
     - nextcloud
 
 - hosts: harbor
   roles:
-    - auto_upgrades
+    - auto-upgrades
     - docker
     - harbor
+
+- hosts: k8s
+  roles:
+    - auto-upgrades
+    - docker
+    - k8s-all
+
+- hosts: k8s-master
+  roles:
+    - k8s-master
+
+- hosts: k8s_nodes
+  roles:
+    - k8s-nodes

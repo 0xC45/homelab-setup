@@ -1,0 +1,55 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+  name: check platform
+  fail:
+    msg: This role requires Debian 10
+
+- name: check if swap is enabled
+  register: swap_enabled
+  changed_when: false
+  become: true
+  shell: swapon --show
+
+- name: disable swap for running kernel
+  when: swap_enabled.stdout_lines|length > 0
+  become: true
+  shell: swapoff -a
+
+- name: disable swap permanently in fstab
+  become: true
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+
+- name: add google cloud gpg key
+  become: true
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: add google cloud apt repository
+  become: true
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+
+- name: install kubernetes packages
+  become: true
+  apt:
+    update_cache: true
+    name: '{{ k8s_package_name }}'
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+  loop_control:
+    loop_var: k8s_package_name
+
+- name: check held packages
+  register: held_packages
+  changed_when: false
+  shell: apt-mark showhold
+
+- name: hold kubernetes packages
+  when: (not "kubelet" in held_packages.stdout) or (not "kubeadm" in held_packages.stdout) or (not "kubectl" in held_packages.stdout)
+  become: true
+  shell: apt-mark hold kubelet kubeadm kubectl

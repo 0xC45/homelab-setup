@@ -1,0 +1,2 @@
+---
+ansible_become_pass: k8s_sudo_password
