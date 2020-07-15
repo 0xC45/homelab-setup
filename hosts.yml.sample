@@ -2,7 +2,7 @@ all:
   hosts:
     router:
       ansible_host: 192.168.1.1
-      ansible_python_interpreter: /usr/local/bin/python3
+      ansible_python_interpreter: /usr/local/bin/python3.8
       ansible_become_method: su
     gitea:
       ansible_host: gitea.mydomain.com
@@ -10,7 +10,51 @@ all:
     nextcloud:
       ansible_host: nextcloud.mydomain.com
       ansible_python_interpreter: /usr/bin/python2
+    harbor:
+      ansible_host: harbor.mydomain.com
+      ansible_python_interpreter: /usr/bin/python2
+    k8s-master:
+      ansible_host: k8s-master.mydomain.com
+      ansible_python_interpreter: /usr/bin/python2
+    k8s-node-1:
+      ansible_host: k8s-node-1.mydomain.com
+      ansible_python_interpreter: /usr/bin/python2
+    k8s-node-2:
+      ansible_host: k8s-node-2.mydomain.com
+      ansible_python_interpreter: /usr/bin/python2
+    k8s-node-3:
+      ansible_host: k8s-node-3.mydomain.com
+      ansible_python_interpreter: /usr/bin/python2
+    k8s-node-4:
+      ansible_host: k8s-node-4.mydomain.com
+      ansible_python_interpreter: /usr/bin/python2
+    k8s-node-5:
+      ansible_host: k8s-node-5.mydomain.com
+      ansible_python_interpreter: /usr/bin/python2
   children:
     vms:
-      gitea:
-      nextcloud:
+      hosts:
+        gitea:
+        nextcloud:
+        harbor:
+        k8s-master:
+        k8s-node-1:
+        k8s-node-2:
+        k8s-node-3:
+        k8s-node-4:
+        k8s-node-5:
+    k8s:
+      hosts:
+        k8s-master:
+        k8s-node-1:
+        k8s-node-2:
+        k8s-node-3:
+        k8s-node-4:
+        k8s-node-5:
+    k8s_nodes:
+      hosts:
+        k8s-node-1:
+        k8s-node-2:
+        k8s-node-3:
+        k8s-node-4:
+        k8s-node-5:
