@@ -33,15 +33,15 @@
   register: gitea_archive
   become: true
   stat:
-    path: /root/ansible-workdir/gitea/gitea-1.12.1.xz
+    path: /root/ansible-workdir/gitea/gitea-1.12.2.xz
 
 - name: download gitea archive
   when: gitea_archive.stat.exists == false
   become: true
   get_url:
-    url: https://dl.gitea.io/gitea/1.12.1/gitea-1.12.1-linux-amd64.xz
-    checksum: sha256:556b11456f1f03bed8604325886b4c2a903664c496ef5fac2d45e7e350ee77e6
-    dest: /root/ansible-workdir/gitea/gitea-1.12.1.xz
+    url: https://dl.gitea.io/gitea/1.12.2/gitea-1.12.2-linux-amd64.xz
+    checksum: sha256:3886916412ddefbcc6cfed19e2082d7496e2c72a36759bd46288c222bc85e485
+    dest: /root/ansible-workdir/gitea/gitea-1.12.2.xz
     mode: 0600
     owner: root
     group: root
@@ -50,17 +50,17 @@
   register: gitea_binary
   become: true
   stat:
-    path: /root/ansible-workdir/gitea/gitea-1.12.1
+    path: /root/ansible-workdir/gitea/gitea-1.12.2
 
 - name: extract gitea binary from archive
   when: gitea_binary.stat.exists == false
   become: true
-  shell: unxz -k /root/ansible-workdir/gitea/gitea-1.12.1.xz
+  shell: unxz -k /root/ansible-workdir/gitea/gitea-1.12.2.xz
 
 - name: install gitea binary to global location
   become: true
   copy:
-    src: /root/ansible-workdir/gitea/gitea-1.12.1
+    src: /root/ansible-workdir/gitea/gitea-1.12.2
     remote_src: true
     dest: /usr/local/bin/gitea
     mode: 0755
