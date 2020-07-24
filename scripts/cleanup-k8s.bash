@@ -6,4 +6,3 @@ ansible \
   --ask-vault-pass \
   --become \
   -a "/bin/bash -c 'kubeadm reset --force'"
-
