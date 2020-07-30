@@ -12,12 +12,12 @@
 - name: initialize control plane
   when: kubelet_on_control_plane.stdout == "0"
   become: true
-  shell: kubeadm init --pod-network-cidr=192.168.42.0/16
+  shell: kubeadm init --pod-network-cidr=10.244.0.0/16
 
-- name: setup calico pod network add-on
+- name: setup flannel pod network add-on
   when: kubelet_on_control_plane.stdout == "0"
   become: true
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl create -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
 - name: install jq
   become: true
