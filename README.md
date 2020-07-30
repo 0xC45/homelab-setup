@@ -164,5 +164,5 @@ This project is the "configuration as code" for my homelab environment. The proj
     ```
     mkdir ~/.kube
     chmod 770 ~/.kube
-    scp user@k8s-master.mydomain.com:~/.kube/config ~/.kube/config
+    scp user@k8s-control-plane.mydomain.com:~/.kube/config ~/.kube/config
     ```

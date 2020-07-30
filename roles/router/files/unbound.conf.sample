@@ -13,7 +13,7 @@ server:
 	local-data: "gitea.mydomain.com A 192.168.1.2"
 	local-data: "nextcloud.mydomain.com A 192.168.1.3"
 	local-data: "harbor.mydomain.com A 192.168.1.4"
-	local-data: "k8s-master.mydomain.com A 192.168.1.10"
+	local-data: "k8s-control-plane.mydomain.com A 192.168.1.10"
 	local-data: "k8s-node-1.mydomain.com A 192.168.1.11"
 	local-data: "k8s-node-2.mydomain.com A 192.168.1.12"
 	local-data: "k8s-node-3.mydomain.com A 192.168.1.13"

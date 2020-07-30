@@ -13,6 +13,6 @@
   when: kubelet_on_node.stdout == "0"
   become: true
   shell: |
-    kubeadm join --token {{ hostvars['k8s-master']['k8s_bootstrap_token']['stdout'] }} \
-      {{ hostvars['k8s-master']['ansible_default_ipv4']['address'] }}:6443 \
-      --discovery-token-ca-cert-hash sha256:{{ hostvars['k8s-master']['k8s_discovery_token']['stdout'] }}
+    kubeadm join --token {{ hostvars['k8s-control-plane']['k8s_bootstrap_token']['stdout'] }} \
+      {{ hostvars['k8s-control-plane']['ansible_default_ipv4']['address'] }}:6443 \
+      --discovery-token-ca-cert-hash sha256:{{ hostvars['k8s-control-plane']['k8s_discovery_token']['stdout'] }}

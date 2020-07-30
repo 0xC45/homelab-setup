@@ -5,17 +5,17 @@
     msg: This role requires Debian 10
 
 - name: check if kubelet is running
-  register: kubelet_on_master
+  register: kubelet_on_control_plane
   changed_when: false
   shell: ps aux | grep kubelet | grep -v grep | wc -l
 
 - name: initialize control plane
-  when: kubelet_on_master.stdout == "0"
+  when: kubelet_on_control_plane.stdout == "0"
   become: true
   shell: kubeadm init --pod-network-cidr=192.168.42.0/16
 
 - name: setup calico pod network add-on
-  when: kubelet_on_master.stdout == "0"
+  when: kubelet_on_control_plane.stdout == "0"
   become: true
   shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl create -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
 
@@ -26,7 +26,7 @@
     name: jq
 
 - name: save cluster bootstrap token
-  when: kubelet_on_master.stdout == "0"
+  when: kubelet_on_control_plane.stdout == "0"
   register: k8s_bootstrap_token
   become: true
   shell: |
@@ -35,7 +35,7 @@
       head -n 1
 
 - name: save cluster discovery token
-  when: kubelet_on_master.stdout == "0"
+  when: kubelet_on_control_plane.stdout == "0"
   register: k8s_discovery_token
   become: true
   shell: |
