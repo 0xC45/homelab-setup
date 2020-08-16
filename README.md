@@ -9,6 +9,7 @@ This project is the "configuration as code" for my homelab environment. The proj
 1. [Nextcloud](#nextcloud)
 1. [Harbor](#harbor)
 1. [Kubernetes](#kubernetes)
+1. [OctoPi](#octopi)
 
 
 ## Router
@@ -166,3 +167,42 @@ This project is the "configuration as code" for my homelab environment. The proj
     chmod 770 ~/.kube
     scp user@k8s-control-plane.mydomain.com:~/.kube/config ~/.kube/config
     ```
+
+
+## OctoPi
+
+1. Install [OctoPi](https://github.com/guysoft/OctoPi)
+1. Configure WiFi by editing `octopi-wpa-supplicant.txt` on the root partition
+1. Connect to Raspberry Pi
+    ```
+    ssh pi@octopi.mydomain.com # password: raspberry
+    ```
+1. Edit system settings
+    ```
+    sudo raspi-config
+    # change password
+    # set locale (under Localisation)
+    # set timezone (under Localisation)
+    ```
+1. Change root user password
+    ```
+    sudo su -
+    passwd
+    ```
+1. Create user account
+    ```
+    adduser <user>
+    usermod -aG sudo <user>
+    ```
+1. Setup passwordless SSH for user
+    ```
+    mkdir .ssh
+    chmod 700 .ssh
+    touch .ssh/authorized_keys
+    chmod 600 .ssh/authorized_keys
+    vi .ssh/authorized_keys
+    ```
+1. Run homelab-setup ansible playbook
+   ```
+   make octopi
+   ```

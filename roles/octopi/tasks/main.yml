@@ -1,0 +1,31 @@
+---
+- when: ansible_distribution != 'Debian' or ansible_lsb['id'] != 'Raspbian'
+  name: check platform
+  fail:
+    msg: This role requires Raspbian
+
+- name: copy ssl cert
+  become: true
+  copy:
+    content: '{{ octopi_pem }}'
+    dest: /home/pi/octopi.pem
+    owner: pi
+    group: pi
+    mode: '0600'
+  notify: restart haproxy
+
+- name: configure haproxy to use custom ssl cert
+  become: true
+  replace:
+    path: /etc/haproxy/haproxy.cfg
+    regexp: 'bind \:\:\:443 v4v6 ssl crt \/etc\/ssl\/snakeoil\.pem'
+    replace: 'bind :::443 v4v6 ssl crt /home/pi/octopi.pem'
+  notify: restart haproxy
+
+- name: configure haproxy to redirect http to https
+  become: true
+  replace:
+    path: /etc/haproxy/haproxy.cfg
+    regexp: '(\s+bind \:\:\:80.*\n)        (?!redirect scheme https if !{ ssl_fc })'
+    replace: '\1        redirect scheme https if !{ ssl_fc }\n        '
+  notify: restart haproxy

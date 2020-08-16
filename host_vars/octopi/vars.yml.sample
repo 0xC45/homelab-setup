@@ -1,0 +1,5 @@
+---
+ansible_become_pass: octopi_sudo_password
+octopi_cert_pem: |
+  octopi_cert
+  octopi_key

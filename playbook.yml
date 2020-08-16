@@ -40,3 +40,7 @@
 - hosts: k8s_nodes
   roles:
     - k8s-nodes
+
+- hosts: octopi
+  roles:
+    - octopi

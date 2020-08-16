@@ -1,0 +1,11 @@
+---
+- name: raspbian - upgrade installed packages
+  become: true
+  apt:
+    update_cache: true
+    upgrade: safe
+
+- name: raspbian - install vim
+  become: true
+  apt:
+    name: vim

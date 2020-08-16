@@ -31,6 +31,9 @@ all:
     k8s-node-5:
       ansible_host: k8s-node-5.mydomain.com
       ansible_python_interpreter: /usr/bin/python2
+    octopi:
+      ansible_host: octopi.mydomain.com
+      ansible_python_interpreter: /usr/bin/python3.7
   children:
     vms:
       hosts:

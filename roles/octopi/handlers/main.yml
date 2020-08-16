@@ -1,0 +1,6 @@
+---
+- name: restart haproxy
+  become: true
+  systemd:
+    state: restarted
+    name: haproxy

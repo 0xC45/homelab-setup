@@ -6,6 +6,7 @@ case "${1}" in
 "nextcloud") ;;
 "harbor") ;;
 "k8s") ;;
+"octopi") ;;
 *)
   echo "error: specify service to configure (for example: ./scripts/run-playbook router)"
   exit 1
