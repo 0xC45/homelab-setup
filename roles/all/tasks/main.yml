@@ -2,7 +2,7 @@
 - when: ansible_facts['distribution'] == "Debian" and ansible_facts['lsb']['id'] != "Raspbian"
   import_tasks: debian.yml
 
-- when: ansible_facts['lsb']['id'] == "Raspbian"
+- when: ansible_facts['lsb']['id'] is defined and ansible_facts['lsb']['id'] == "Raspbian"
   import_tasks: raspbian.yml
 
 - when: ansible_facts['distribution'] == "OpenBSD"
