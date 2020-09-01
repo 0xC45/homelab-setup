@@ -10,8 +10,8 @@
     name: '*'
     state: latest
 
-- name: openbsd - install vim
-  become: true
-  openbsd_pkg:
-    name: vim-8.2.534-no_x11
-    state: latest
+#- name: openbsd - install vim
+#  become: true
+#  openbsd_pkg:
+#    name: vim-8.2.534-no_x11
+#    state: latest
