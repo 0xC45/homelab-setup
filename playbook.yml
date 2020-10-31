@@ -27,6 +27,10 @@
     - docker
     - harbor
 
+- hosts: desktop
+  roles:
+    - desktop
+
 - hosts: k8s
   roles:
     - auto-upgrades

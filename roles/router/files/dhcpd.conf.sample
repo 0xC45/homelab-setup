@@ -19,6 +19,10 @@ subnet 192.168.1.0 netmask 255.255.255.0 {
 		fixed-address 192.168.1.5;
 		hardware ethernet de:ad:be:ef:00:04;
 	}
+	host desktop {
+		fixed-address 192.168.1.6;
+		hardware ethernet de:ad:be:ef:00:05;
+	}
 	host k8s-control-plane {
 		fixed-address 192.168.1.10;
 		hardware ethernet f0:0d:d0:0d:00:00;

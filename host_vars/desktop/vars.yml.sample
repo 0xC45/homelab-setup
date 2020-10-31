@@ -1,0 +1,2 @@
+---
+ansible_become_pass: desktop_sudo_password

@@ -1,0 +1,38 @@
+---
+- when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '20.04'
+  name: check platform
+  fail:
+    msg: This playbook requires Ubuntu 20.04
+
+- name: install dependencies
+  become: true
+  apt:
+    name: '{{ ubiquiti_package_name }}'
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - openjdk-8-jre
+  loop_control:
+    loop_var: ubiquiti_package_name
+
+- name: add ubiquiti gpg key
+  become: true
+  apt_key:
+    url: https://dl.ui.com/unifi/unifi-repo.gpg
+
+- name: add ubiquiti package repository
+  become: true
+  apt_repository:
+    repo: deb https://www.ui.com/downloads/unifi/debian stable ubiquiti
+
+- name: install ubiquiti controller
+  become: true
+  apt:
+    name: unifi
+
+- name: disable and stop ubiquiti
+  become: true
+  systemd:
+    enabled: false
+    state: stopped
+    name: unifi

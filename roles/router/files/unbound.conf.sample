@@ -14,6 +14,7 @@ server:
 	local-data: "nextcloud.mydomain.com A 192.168.1.3"
 	local-data: "harbor.mydomain.com A 192.168.1.4"
 	local-data: "octopi.mydomain.com A 192.168.1.5"
+	local-data: "desktop.mydomain.com A 192.168.1.6"
 	local-data: "k8s-control-plane.mydomain.com A 192.168.1.10"
 	local-data: "k8s-node-1.mydomain.com A 192.168.1.11"
 	local-data: "k8s-node-2.mydomain.com A 192.168.1.12"

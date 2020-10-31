@@ -1,8 +1,10 @@
 ---
-- when: ansible_distribution != 'Debian' or ansible_distribution_version != '10'
+- when: |
+    (ansible_distribution != 'Debian' or ansible_distribution_version != '10') and
+    (ansible_distribution != 'Ubuntu' or ansible_distribution_version != '20.04')
   name: check platform
   fail:
-    msg: This role requires Debian 10
+    msg: This role requires Debian 10 or Ubuntu 20.04
 
 - name: install open-vm-tools
   become: true

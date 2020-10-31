@@ -1,0 +1,23 @@
+---
+- when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '20.04'
+  name: check platform
+  fail:
+    msg: This playbook requires Ubuntu 20.04
+
+- name: create ~/workspace directory
+  file:
+    path: /home/{{ ansible_user_id }}/workspace
+    state: directory
+    mode: 0755
+
+- name: create ~/.cache/ansible-workdir directory
+  file:
+    path: /home/{{ ansible_user_id }}/.cache/ansible-workdir
+    state: directory
+    mode: 0755
+
+- include_tasks: '{{ task_name }}'
+  loop:
+    - ubiquiti.yml
+  loop_control:
+    loop_var: task_name

@@ -13,6 +13,9 @@ all:
     harbor:
       ansible_host: harbor.mydomain.com
       ansible_python_interpreter: /usr/bin/python2
+    desktop:
+      ansible_host: desktop.mydomain.com
+      ansible_python_interpreter: /usr/bin/python3.8
     k8s-control-plane:
       ansible_host: k8s-control-plane.mydomain.com
       ansible_python_interpreter: /usr/bin/python2
@@ -40,6 +43,7 @@ all:
         gitea:
         nextcloud:
         harbor:
+        desktop:
         k8s-control-plane:
         k8s-node-1:
         k8s-node-2:

@@ -7,6 +7,7 @@ case "${1}" in
 "harbor") ;;
 "k8s") ;;
 "octopi") ;;
+"desktop") ;;
 *)
   echo "error: specify service to configure (for example: ./scripts/run-playbook router)"
   exit 1
