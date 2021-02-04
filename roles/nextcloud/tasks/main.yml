@@ -24,6 +24,7 @@
     - php7.3-zip            # required
     - php7.3-bz2            # recommended, for extraction of apps
     - php7.3-intl           # recommended, for language translation and handling of non-ASCII characters
+    - php7.3-bcmath         # optional, for passwordless login
     - php7.3-gmp            # optional, for sftp storage
     - php-imagick           # optional, for image preview generation
     - rsync                 # optional, for backup/restore
