@@ -21,15 +21,15 @@
   register: docker_compose_binary
   become: true
   stat:
-    path: /root/ansible-workdir/harbor/docker-compose-1.27.4-Linux-x86_64
+    path: /root/ansible-workdir/harbor/docker-compose-1.28.2-Linux-x86_64
 
 - name: download docker-compose binary
   when: docker_compose_binary.stat.exists == false
   become: true
   get_url:
-    url: https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-x86_64
-    checksum: sha256:04216d65ce0cd3c27223eab035abfeb20a8bef20259398e3b9d9aa8de633286d
-    dest: /root/ansible-workdir/harbor/docker-compose-1.27.4-Linux-x86_64
+    url: https://github.com/docker/compose/releases/download/1.28.2/docker-compose-Linux-x86_64
+    checksum: sha256:e984402b96bb923319f8ac95c8d26944e12d15692ab0fea4fff63ddfd5fd8d64
+    dest: /root/ansible-workdir/harbor/docker-compose-1.28.2-Linux-x86_64
     mode: 0700
     owner: root
     group: root
@@ -37,7 +37,7 @@
 - name: install docker-compose binary to global location
   become: true
   copy:
-    src: /root/ansible-workdir/harbor/docker-compose-1.27.4-Linux-x86_64
+    src: /root/ansible-workdir/harbor/docker-compose-1.28.2-Linux-x86_64
     remote_src: true
     dest: /usr/local/bin/docker-compose
     mode: 0755
