@@ -46,15 +46,15 @@
   register: nextcloud_archive
   become: true
   stat:
-    path: /root/ansible-workdir/nextcloud/nextcloud-20.0.4.tar.bz2
+    path: /root/ansible-workdir/nextcloud/nextcloud-20.0.7.tar.bz2
 
 - name: download nextcloud archive
   when: nextcloud_archive.stat.exists == false
   become: true
   get_url:
-    url: https://download.nextcloud.com/server/releases/nextcloud-20.0.4.tar.bz2
-    checksum: sha256:269f1622e326f5d11e387d3861aad4e2b0e79334ae97eed5a7b3352ba7661420
-    dest: /root/ansible-workdir/nextcloud/nextcloud-20.0.4.tar.bz2
+    url: https://download.nextcloud.com/server/releases/nextcloud-20.0.7.tar.bz2
+    checksum: sha256:8ced82b772bf0af67d5be1323e40f977429bc0a2bcc864095efc78767500b72b
+    dest: /root/ansible-workdir/nextcloud/nextcloud-20.0.7.tar.bz2
     mode: 0600
     owner: root
     group: root
@@ -62,7 +62,7 @@
 - name: extract nextcloud archive
   become: true
   unarchive:
-    src: /root/ansible-workdir/nextcloud/nextcloud-20.0.4.tar.bz2
+    src: /root/ansible-workdir/nextcloud/nextcloud-20.0.7.tar.bz2
     remote_src: true
     dest: /var/www/
     creates: /var/www/nextcloud
