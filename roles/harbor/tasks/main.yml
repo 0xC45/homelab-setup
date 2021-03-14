@@ -21,15 +21,15 @@
   register: docker_compose_binary
   become: true
   stat:
-    path: /root/ansible-workdir/harbor/docker-compose-1.28.2-Linux-x86_64
+    path: /root/ansible-workdir/harbor/docker-compose-1.28.5-Linux-x86_64
 
 - name: download docker-compose binary
   when: docker_compose_binary.stat.exists == false
   become: true
   get_url:
-    url: https://github.com/docker/compose/releases/download/1.28.2/docker-compose-Linux-x86_64
-    checksum: sha256:e984402b96bb923319f8ac95c8d26944e12d15692ab0fea4fff63ddfd5fd8d64
-    dest: /root/ansible-workdir/harbor/docker-compose-1.28.2-Linux-x86_64
+    url: https://github.com/docker/compose/releases/download/1.28.5/docker-compose-Linux-x86_64
+    checksum: sha256:46406eb5d8443cc0163a483fcff001d557532a7fad5981e268903ad40b75534c
+    dest: /root/ansible-workdir/harbor/docker-compose-1.28.5-Linux-x86_64
     mode: 0700
     owner: root
     group: root
@@ -37,7 +37,7 @@
 - name: install docker-compose binary to global location
   become: true
   copy:
-    src: /root/ansible-workdir/harbor/docker-compose-1.28.2-Linux-x86_64
+    src: /root/ansible-workdir/harbor/docker-compose-1.28.5-Linux-x86_64
     remote_src: true
     dest: /usr/local/bin/docker-compose
     mode: 0755
@@ -76,15 +76,15 @@
   register: harbor_archive
   become: true
   stat:
-    path: /root/ansible-workdir/harbor/harbor-offline-installer-v2.1.3.tgz
+    path: /root/ansible-workdir/harbor/harbor-offline-installer-v2.2.0.tgz
 
 - name: download harbor archive
   when: harbor_archive.stat.exists == false
   become: true
   get_url:
-    url: https://github.com/goharbor/harbor/releases/download/v2.1.3/harbor-offline-installer-v2.1.3.tgz
-    checksum: md5:42077f945e2e580cab98d10a82699534
-    dest: /root/ansible-workdir/harbor/harbor-offline-installer-v2.1.3.tgz
+    url: https://github.com/goharbor/harbor/releases/download/v2.2.0/harbor-offline-installer-v2.2.0.tgz
+    checksum: md5:54d2525ff4378fe041f9b2dafa2cd3bb
+    dest: /root/ansible-workdir/harbor/harbor-offline-installer-v2.2.0.tgz
     mode: 0600
     owner: root
     group: root
@@ -92,7 +92,7 @@
 - name: extract harbor archive
   become: true
   unarchive:
-    src: /root/ansible-workdir/harbor/harbor-offline-installer-v2.1.3.tgz
+    src: /root/ansible-workdir/harbor/harbor-offline-installer-v2.2.0.tgz
     remote_src: true
     dest: /home/harbor
     creates: /home/harbor/harbor
@@ -153,7 +153,7 @@
 - name: run harbor install script
   when: harbor_archive.stat.exists == false
   become: true
-  shell: /home/harbor/harbor/install.sh --with-clair
+  shell: /home/harbor/harbor/install.sh --with-trivy
 
 ########## SYSTEMD SERVICE
 
