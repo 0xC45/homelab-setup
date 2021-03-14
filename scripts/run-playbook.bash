@@ -14,7 +14,7 @@ case "${1}" in
 esac
 
 ansible-playbook \
-  -i hosts.yml \
+  -i "${HOSTS_FILE}" \
   -l "${1}" \
   --ask-vault-pass \
   playbook.yml

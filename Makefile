@@ -1,2 +1,4 @@
+HOSTS_FILE := hosts.yml
+
 %:
-	./scripts/run-playbook.bash $@
+	HOSTS_FILE=$(HOSTS_FILE) ./scripts/run-playbook.bash $@
