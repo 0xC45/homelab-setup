@@ -75,7 +75,7 @@ This project is the "configuration as code" for my homelab environment. The proj
 
 1. Provision a VM
     - 1 CPU
-    - 1 GB memory
+    - 2 GB memory
     - 64 GB disk
 1. Install Debian 10
     - Disable GUI

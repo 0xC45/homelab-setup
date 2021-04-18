@@ -46,15 +46,15 @@
   register: nextcloud_archive
   become: true
   stat:
-    path: /root/ansible-workdir/nextcloud/nextcloud-20.0.8.tar.bz2
+    path: /root/ansible-workdir/nextcloud/nextcloud-21.0.1.tar.bz2
 
 - name: download nextcloud archive
   when: nextcloud_archive.stat.exists == false
   become: true
   get_url:
-    url: https://download.nextcloud.com/server/releases/nextcloud-20.0.8.tar.bz2
-    checksum: sha256:85746a4bda87bf754be5834cdb6489c365dc847653bab8ff3afccdaac3b356b5
-    dest: /root/ansible-workdir/nextcloud/nextcloud-20.0.8.tar.bz2
+    url: https://download.nextcloud.com/server/releases/nextcloud-21.0.1.tar.bz2
+    checksum: sha256:dd7c8ccc01547914a75b44bbf86028289c8919dc39f4e2e720147b6bd596aebe
+    dest: /root/ansible-workdir/nextcloud/nextcloud-21.0.1.tar.bz2
     mode: 0600
     owner: root
     group: root
@@ -62,12 +62,20 @@
 - name: extract nextcloud archive
   become: true
   unarchive:
-    src: /root/ansible-workdir/nextcloud/nextcloud-20.0.8.tar.bz2
+    src: /root/ansible-workdir/nextcloud/nextcloud-21.0.1.tar.bz2
     remote_src: true
     dest: /var/www/
     creates: /var/www/nextcloud
     owner: www-data
     group: www-data
+
+- name: setup nextcloud cron job
+  become: true
+  ansible.builtin.cron:
+    user: 'www-data'
+    name: '/var/www/nextcloud/cron.php'
+    minute: '*/5'
+    job: 'php -f /var/www/nextcloud/cron.php'
 
 ########## TLS CERTIFICATES
 
@@ -148,6 +156,15 @@
   become: true
   shell: a2dissite 000-default.conf
   changed_when: "'already disabled' not in disable_default_result.stdout"
+  notify: restart apache
+
+########## PHP
+- name: set php memory_limit
+  become: true
+  replace:
+    path: /etc/php/7.3/apache2/php.ini
+    regexp: '^memory_limit = .*$'
+    replace: 'memory_limit = 512M'
   notify: restart apache
 
 ########## POSTGRES
