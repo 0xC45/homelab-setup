@@ -76,15 +76,15 @@
   register: harbor_archive
   become: true
   stat:
-    path: /root/ansible-workdir/harbor/harbor-offline-installer-v2.4.0.tgz
+    path: /root/ansible-workdir/harbor/harbor-offline-installer-v2.4.1.tgz
 
 - name: download harbor archive
   when: harbor_archive.stat.exists == false
   become: true
   get_url:
-    url: https://github.com/goharbor/harbor/releases/download/v2.4.0/harbor-offline-installer-v2.4.0.tgz
-    checksum: md5:aeb0736cf6952e81c67345fbac3ef626
-    dest: /root/ansible-workdir/harbor/harbor-offline-installer-v2.4.0.tgz
+    url: https://github.com/goharbor/harbor/releases/download/v2.4.1/harbor-offline-installer-v2.4.1.tgz
+    checksum: md5:2d7b4c93f4205b3a13c5aab0ac9ad0e9
+    dest: /root/ansible-workdir/harbor/harbor-offline-installer-v2.4.1.tgz
     mode: 0600
     owner: root
     group: root
@@ -92,7 +92,7 @@
 - name: extract harbor archive
   become: true
   unarchive:
-    src: /root/ansible-workdir/harbor/harbor-offline-installer-v2.4.0.tgz
+    src: /root/ansible-workdir/harbor/harbor-offline-installer-v2.4.1.tgz
     remote_src: true
     dest: /home/harbor
     creates: /home/harbor/harbor
