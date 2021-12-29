@@ -11,23 +11,24 @@
   apt:
     name: '{{ nextcloud_package_name }}'
   loop:
-    - apache2               # required, web server
-    - libapache2-mod-php7.3 # required, apache php module
-    - postgresql-11         # required, database
-    - python-psycopg2       # required, for ansible postgres modules
-    - php7.3                # required, server-side scripting language
-    - php7.3-pgsql          # required, database connector module
-    - php7.3-curl           # required
-    - php7.3-gd             # required
-    - php7.3-mbstring       # required
-    - php7.3-xml            # required
-    - php7.3-zip            # required
-    - php7.3-bz2            # recommended, for extraction of apps
-    - php7.3-intl           # recommended, for language translation and handling of non-ASCII characters
-    - php7.3-bcmath         # optional, for passwordless login
-    - php7.3-gmp            # optional, for sftp storage
-    - php-imagick           # optional, for image preview generation
-    - rsync                 # optional, for backup/restore
+    - apache2                     # required, web server
+    - libapache2-mod-php7.3       # required, apache php module
+    - postgresql-11               # required, database
+    - python-psycopg2             # required, for ansible postgres modules
+    - php7.3                      # required, server-side scripting language
+    - php7.3-pgsql                # required, database connector module
+    - php7.3-curl                 # required
+    - php7.3-gd                   # required
+    - php7.3-mbstring             # required
+    - php7.3-xml                  # required
+    - php7.3-zip                  # required
+    - php7.3-bz2                  # recommended, for extraction of apps
+    - php7.3-intl                 # recommended, for language translation and handling of non-ASCII characters
+    - php7.3-bcmath               # optional, for passwordless login
+    - php7.3-gmp                  # optional, for sftp storage
+    - php-imagick                 # optional, for image preview generation
+    - libmagickcore-6.q16-6-extra # optional, for php-imagick svg support
+    - rsync                       # optional, for backup/restore
   loop_control:
     loop_var: nextcloud_package_name
 
@@ -46,15 +47,15 @@
   register: nextcloud_archive
   become: true
   stat:
-    path: /root/ansible-workdir/nextcloud/nextcloud-22.2.0.tar.bz2
+    path: /root/ansible-workdir/nextcloud/nextcloud-23.0.0.tar.bz2
 
 - name: download nextcloud archive
   when: nextcloud_archive.stat.exists == false
   become: true
   get_url:
-    url: https://download.nextcloud.com/server/releases/nextcloud-22.2.0.tar.bz2
-    checksum: sha256:273dba3ce43501b897e8b78996b50329e31da2b5402866ac20b318cdaddf3e1f
-    dest: /root/ansible-workdir/nextcloud/nextcloud-22.2.0.tar.bz2
+    url: https://download.nextcloud.com/server/releases/nextcloud-23.0.0.tar.bz2
+    checksum: sha256:c37592abc3b65c8fd28459281a24f414b87af52fc8c2ea979be3f9be75d01a2c
+    dest: /root/ansible-workdir/nextcloud/nextcloud-23.0.0.tar.bz2
     mode: 0600
     owner: root
     group: root
@@ -62,7 +63,7 @@
 - name: extract nextcloud archive
   become: true
   unarchive:
-    src: /root/ansible-workdir/nextcloud/nextcloud-22.2.0.tar.bz2
+    src: /root/ansible-workdir/nextcloud/nextcloud-23.0.0.tar.bz2
     remote_src: true
     dest: /var/www/
     creates: /var/www/nextcloud
