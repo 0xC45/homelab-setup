@@ -1,3 +1,9 @@
+# ⚠️ Archived ⚠️
+
+Warning: This repo is no longer maintained.
+
+---
+
 # Homelab Setup
 
 This project is the "configuration as code" for my homelab environment. The project goal is to simplify management, updates, and configuration changes for every service running on my home network so that I don't get bogged down with day 2 operations (preventing me from focusing on my other projects). This document describes the steps required to (re)deploy each service from scratch.
